@@ -3,7 +3,7 @@ name: Build and Deploy Jekyll Site to GitHub Pages
 on:
   push:
     branches:
-      - main  # 源代码所在的分支
+      - master  # 源代码所在的分支
 
 jobs:
   build-and-deploy:
