@@ -21,6 +21,8 @@ jobs:
         with:
           name: github-pages
           path: downloaded_pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clear gh-pages branch
         run: |
