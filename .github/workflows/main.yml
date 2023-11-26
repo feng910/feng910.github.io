@@ -1,0 +1,42 @@
+name: Force Update and Deploy to gh-pages
+
+on:
+  push:
+    branches:
+      - main  # 或您的默认分支
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          fetch-depth: 0  # 获取所有历史，以便可以清空
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: github-pages
+          path: downloaded_pages
+
+      - name: Clear gh-pages branch
+        run: |
+          # 删除所有文件（除了.git）
+          find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
+      
+      - name: Copy new content
+        run: |
+          cp -r downloaded_pages/* ./
+          rm -rf downloaded_pages
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "Deploy GitHub Pages" || echo "No changes to commit"
+
+      - name: Force push to gh-pages
+        run: git push origin gh-pages --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
