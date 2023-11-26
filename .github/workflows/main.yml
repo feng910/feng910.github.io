@@ -3,7 +3,7 @@ name: Build and Deploy Jekyll Site to GitHub Pages
 on:
   push:
     branches:
-      - main  # 源代码所在的分支
+      - master  # 源代码所在的分支
 
 jobs:
   build-and-deploy:
@@ -12,18 +12,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0'  # 根据您的项目选择合适的 Ruby 版本
-
-      - name: Install dependencies
-        run: |
-          bundle install
-
       - name: Build Jekyll Site
-        run: |
-          bundle exec jekyll build
+        uses: actions/jekyll-build-pages@v1
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
