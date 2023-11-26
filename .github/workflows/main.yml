@@ -1,42 +1,26 @@
-name: Force Update and Deploy to gh-pages
+name: Deploy to GitHub Pages
 
 on:
-  workflow_dispatch:  # 手动触发
-  push:               # 在有新提交时触发
+  push:
     branches:
-      - main  # 或您的默认分支
+      - main  # 或者是您用于源代码的分支
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Build Jekyll Site
+        run: |
+          gem install jekyll bundler
+          bundle install
+          bundle exec jekyll build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          ref: gh-pages
-          fetch-depth: 0  # 获取所有历史，以便可以清空
-
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Clear gh-pages branch
-        run: |
-          # 删除所有文件（除了.git）
-          find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
-      
-      - name: Copy new content
-        run: |
-          cp -r downloaded_pages/* ./
-          rm -rf downloaded_pages
-
-      - name: Commit changes
-        run: |
-          git add .
-          git commit -m "Deploy GitHub Pages" || echo "No changes to commit"
-
-      - name: Force push to gh-pages
-        run: git push origin gh-pages --force
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: pages  # 指定要推送到的分支
